@@ -4,6 +4,8 @@ Basic implementation of the Affine-invariant stretch move.
 
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
+import os
 
 global times, y, y_err
 
@@ -95,7 +97,7 @@ def affine_invariant_mcmc(
     b_ensemble = np.random.normal(b_initial_guess, scale=100, size=num_walkers)
 
     for i in range(num_steps):
-        print(f"{i}/{num_steps} steps.", end="\r")
+        print(f"{i+1}/{num_steps} steps.", end="\r")
         for j in range(num_walkers):
 
             m_current, b_current = get_next_state_single_walker(
@@ -117,8 +119,8 @@ def affine_invariant_mcmc(
 if __name__ == "__main__":
     np.random.seed(10)
 
-    num_steps = 500
-    num_walkers = 50
+    num_steps = 1000
+    num_walkers = 100
 
     m_markov_chain, b_markov_chain = affine_invariant_mcmc(
         num_walkers=num_walkers, num_steps=num_steps
@@ -133,3 +135,38 @@ if __name__ == "__main__":
     ax[0].set_ylabel("m")
     ax[1].set_ylabel("b")
     plt.savefig("AI_markov_chain.png", dpi=250)
+    plt.close()
+
+    # make a fun gif
+    os.system("rm gif/*")
+    print()
+    for i in range(num_steps):
+        print(f"Making gif frame {i}/{num_steps}.", end="\r")
+        fig, ax = plt.subplots(figsize=(5, 5))
+        plt.text(-20, 200, f"Step {i+1}/{num_steps}")
+
+        plt.scatter(
+            m_markov_chain[:, i],
+            b_markov_chain[:, i],
+            color="grey",
+            alpha=0.5,
+        )
+
+        plt.xlim(-30, 80)
+        plt.ylim(-50, 250)
+        plt.xlabel("m")
+        plt.ylabel("b")
+        plt.savefig(f"gif/step{i}.png", dpi=250)
+        plt.close()
+
+    frames = [Image.open(f"gif/step{i}.png") for i in range(num_steps)]
+
+    print()
+    print("Saving gif...")
+    frames[0].save(
+        "affine_sampler.gif",
+        save_all=True,
+        append_images=frames[1:],
+        duration=20,
+        loop=0,  # 0 means infinite loop
+    )
