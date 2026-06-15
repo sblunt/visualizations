@@ -2,7 +2,6 @@ import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
-
 global sigma_proposal, times, y, y_err
 
 # choose mcmc hyperparameter
@@ -80,4 +79,4 @@ if __name__ == "__main__":
     plt.plot(markov_chain)
     plt.xlabel("steps")
     plt.ylabel("m")
-    plt.savefig("markov_chain.png", dpi=250)
+    plt.savefig("MH_markov_chain.png", dpi=250)
