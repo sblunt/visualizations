@@ -42,23 +42,11 @@ def calculate_acceptance_prob(m_current, m_new, temp=1):
 
 def calculate_swap_prob(m_temp1, m_temp2, temp1, temp2):
 
-    acceptance_prob = np.min(
-        [
-            1,
-            (
-                calculate_likelihood_prob(m_temp1, temp=1)
-                / calculate_likelihood_prob(m_temp2, temp=1)
-            )
-            ** (1 / temp2 - 1 / temp1),
-        ]
-    )
+    # TODO: add logic to compute the swap probability swap_prob
 
-    return acceptance_prob
+    return swap_prob
 
 
-# create N chains at geometrically spaced temperatures
-# move each chain forward one step
-# compute swap probability and do swap
 def pick_next_state(m_current):
     m_new = np.random.normal(loc=m_current, scale=sigma_proposal)
     return m_new
@@ -76,9 +64,8 @@ def pt_mh_mcmc(
     markov_chain[0, :] = m_initial_guess
 
     # choose a geometric spacing of temperatures (the "default")
-    temperatures = np.ones(num_temps)
-    for i in np.arange(num_temps - 1) + 1:
-        temperatures[i] = temperatures[i - 1] * geometric_lader_factor
+    # TODO: make a "ladder" of temperatures (stored in variable temperatures)
+    # such that temperatures[0] = temp0, and temperatures[i+1]/temperatures[i] = geometric_lader_factor
 
     for i in range(num_steps):
         for j in range(num_temps):
@@ -119,12 +106,17 @@ if __name__ == "__main__":
     num_temps = 3
     geometric_lader_factor = 25
 
+    # TODO: play around with the values of num_temps and geometric_lader_factor.
+    # What happens? Does the behavior you see agree with what you expect?
+
     markov_chain, temperatures = pt_mh_mcmc(
         m_initial_guess=m_initial_guess,
         num_steps=num_steps,
         num_temps=num_temps,
         geometric_lader_factor=geometric_lader_factor,
     )
+
+    # TODO: identify where the temperature "swaps" happen in the plot
 
     plt.figure()
     for i in range(num_temps):
