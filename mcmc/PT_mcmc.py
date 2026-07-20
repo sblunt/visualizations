@@ -42,9 +42,18 @@ def calculate_acceptance_prob(m_current, m_new, temp=1):
 
 def calculate_swap_prob(m_temp1, m_temp2, temp1, temp2):
 
-    # TODO: add logic to compute the swap probability swap_prob
+    acceptance_prob = np.min(
+        [
+            1,
+            (
+                calculate_likelihood_prob(m_temp1, temp=1)
+                / calculate_likelihood_prob(m_temp2, temp=1)
+            )
+            ** (1 / temp2 - 1 / temp1),
+        ]
+    )
 
-    return swap_prob
+    return acceptance_prob
 
 
 def pick_next_state(m_current):
@@ -53,7 +62,7 @@ def pick_next_state(m_current):
 
 
 def pt_mh_mcmc(
-    m_initial_guess=47, num_steps=200, temp0=1, num_temps=5, geometric_lader_factor=10
+    m_initial_guess=47, num_steps=200, temp0=1, num_temps=5, geometric_ladder_factor=10
 ):
 
     num_temp_pairs = num_temps - 1
@@ -64,8 +73,9 @@ def pt_mh_mcmc(
     markov_chain[0, :] = m_initial_guess
 
     # choose a geometric spacing of temperatures (the "default")
-    # TODO: make a "ladder" of temperatures (stored in variable temperatures)
-    # such that temperatures[0] = temp0, and temperatures[i+1]/temperatures[i] = geometric_lader_factor
+    temperatures = np.ones(num_temps)
+    for i in np.arange(num_temps - 1) + 1:
+        temperatures[i] = temperatures[i - 1] * geometric_ladder_factor
 
     for i in range(num_steps):
         for j in range(num_temps):
@@ -104,19 +114,14 @@ if __name__ == "__main__":
     m_initial_guess = 50
     num_steps = 500
     num_temps = 3
-    geometric_lader_factor = 25
-
-    # TODO: play around with the values of num_temps and geometric_lader_factor.
-    # What happens? Does the behavior you see agree with what you expect?
+    geometric_ladder_factor = 25
 
     markov_chain, temperatures = pt_mh_mcmc(
         m_initial_guess=m_initial_guess,
         num_steps=num_steps,
         num_temps=num_temps,
-        geometric_lader_factor=geometric_lader_factor,
+        geometric_ladder_factor=geometric_ladder_factor,
     )
-
-    # TODO: identify where the temperature "swaps" happen in the plot
 
     plt.figure()
     for i in range(num_temps):
