@@ -10,8 +10,8 @@ global sigma_proposal, times, y, y_err
 # choose mcmc hyperparameter
 sigma_proposal = 50
 
-# generate some fake data
-times = np.linspace(0, 10, 100)
+# generate some fake data, purposely attempting to be multi-modal
+times = np.linspace(0, 10, 1_00)
 m_true = 50
 y = times * m_true
 y_err = 10
@@ -23,17 +23,17 @@ def calculate_likelihood_prob(m, times=times, y=y, y_err=y_err, temp=1):
     chi2_array = (residual / y_err) ** 2
     chi2 = np.sum(chi2_array)
 
-    likelihood_prob = np.exp(-0.5 * chi2) ** (1 / temp)
-    return likelihood_prob
+    posterior_prob = np.exp(-0.5 * chi2) ** (1 / temp)
+    return posterior_prob
 
 
-def calculate_acceptance_prob(m_current, m_new):
+def calculate_acceptance_prob(m_current, m_new, temp=1):
 
     acceptance_prob = np.min(
         [
             1,
-            calculate_likelihood_prob(m_new, temp=1)
-            / calculate_likelihood_prob(m_current, temp=1),
+            calculate_likelihood_prob(m_new, temp=temp)
+            / calculate_likelihood_prob(m_current, temp=temp),
         ]
     )
 
