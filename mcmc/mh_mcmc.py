@@ -1,6 +1,5 @@
-import numpy as np
-from scipy.stats import norm
 import matplotlib.pyplot as plt
+import numpy as np
 
 global sigma_proposal, times, y, y_err
 
@@ -54,7 +53,6 @@ def mh_mcmc(m_initial_guess=47, num_steps=200):
 
     m_current = m_initial_guess
     for i in range(num_steps):
-
         m_proposal = pick_next_state(m_current)
         acceptance_prob = calculate_acceptance_prob(m_current, m_proposal)
 
@@ -68,7 +66,6 @@ def mh_mcmc(m_initial_guess=47, num_steps=200):
 
 
 if __name__ == "__main__":
-
     np.random.seed(10)
 
     m_initial_guess = 48
